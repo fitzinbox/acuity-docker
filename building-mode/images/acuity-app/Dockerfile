@@ -1,4 +1,4 @@
-FROM docker.io/openjdk:8u282-jdk
+FROM eclipse-temurin:21-jdk
 
 ARG WAR_NAME
 

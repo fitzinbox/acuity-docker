@@ -28,23 +28,6 @@ services:
       - ./building-mode/builds:/usr/root/builds/
     environment:
       - WAR_NAME=acuity-config-server.war
-  vasecurity:
-    build: building-mode/images/acuity-app
-    restart: always
-    profiles: [ "main" ]
-    networks:
-      - rct_net
-    volumes:
-      - ./logs/vasecurity:/var/log
-      - ./building-mode/builds:/usr/root/builds/
-    environment:
-      - ENV_TYPE_PROFILE=${ENV_TYPE_PROFILE}
-      - AUTH_PROFILE=${AUTH_PROFILE}
-      - CONFIG_PROFILE=${CONFIG_PROFILE}
-      - OTHER_PROFILES=default,postgres-mode
-      - WAR_NAME=vasecurity.war
-    env_file:
-      - env-configs/vasecurity.env
   vahub:
     build: building-mode/images/acuity-app
     restart: always
