@@ -65,7 +65,7 @@ services:
       - CONFIG_PROFILE=${CONFIG_PROFILE}
       - OTHER_PROFILES=NoScheduledJobs
       - WAR_NAME=vahub.war
-      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
+      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888/acuity-spring-configs
     env_file:
       - env-configs/vahub.env
   adminui:
@@ -87,7 +87,7 @@ services:
       - CONFIG_PROFILE=${CONFIG_PROFILE}
       - OTHER_PROFILES=${STORAGE_PROFILE}
       - WAR_NAME=adminui.war
-      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
+      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888/acuity-spring-configs
     env_file:
       - env-configs/adminui.env
   postgres:
