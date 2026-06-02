@@ -1,14 +1,11 @@
-# manages "X-Application-Context" HTTP header setting (more info: https://docs.spring.io/spring-boot/docs/1.4.x/reference/html/common-application-properties.html )
-management:
-  add-application-context-header: false
-
-# manages links rendering behind proxy (more info: https://docs.spring.io/spring-boot/docs/1.5.x/reference/html/howto-embedded-servlet-containers.html#howto-use-tomcat-behind-a-proxy-server )
+# Render links correctly when running behind a reverse proxy (replaces Boot 1.5 server.use-forward-headers)
 server:
-  use-forward-headers: true
+  forward-headers-strategy: native
 
-# path to the logs directory (more info: https://docs.spring.io/spring-boot/docs/1.5.4.RELEASE/reference/htmlsingle/#boot-features-custom-log-configuration )
+# path to the logs directory
 logging:
-  path: /var/log
+  file:
+    path: /var/log
 
 # database connection data. if needed, the ones you need may be overridden for particular app in its config.
 spring:
@@ -17,30 +14,21 @@ spring:
     username: acuity
     password: your_password
     driver-class-name: org.postgresql.Driver
-    fetch:
-      size: 256
-    initial-size: 10
-    max-active: 50
-    max-idle: 30
-    min-idle: 10
-    max-wait: 10000
-    validation-query: SELECT 1
-    test-while-idle: true
-    test-on-borrow: true
-    test-on-return: true
+    hikari:
+      minimum-idle: 10
+      maximum-pool-size: 50
+      connection-timeout: 10000
+      connection-test-query: SELECT 1
+      keepalive-time: 30000
+      idle-timeout: 600000
 
 acuity:
-  # used by AdminUI and VAHub to connect to VASecurity
-  vasecurity:
-    url: http://vasecurity:8000
-    username: username
-    password: pass
-  # used by AdminUI and VASecurity to connect to VAHUb
+  # used by AdminUI to connect to VAHub
   vahub:
     url: http://vahub:8000
     username: username
     password: pass
-  # for VASecurity authorization module used in all ACUITY apps (basic authentication settings; should be here as long as basic authentication is used)
+  # for authorization module used in all ACUITY apps (basic authentication settings)
   security:
     basic-auth:
       users:
@@ -53,7 +41,7 @@ acuity:
           authorities:
             - ADMIN
 
-# Azure Machine Learning settings (used by VASecurity and AdminUI)
+# Azure Machine Learning settings (used by AdminUI)
 azureml:
   enable: false
   webservice:
