@@ -7,10 +7,10 @@ services:
     networks:
       - rct_net
     ports:
-      - "80:80"
-      - "443:443"
-      - "444:444"
-      - "447:447"
+      - "8080:80"
+      - "8443:443"
+      - "8444:444"
+      - "8447:447"
     volumes:
       - ./ssl-certificates/certs:/etc/pki/tls/certs/
       - ./ssl-certificates/keys:/etc/pki/tls/private/
