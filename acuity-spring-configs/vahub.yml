@@ -4,6 +4,10 @@ env:
   name:
     ${ENV_TYPE_PROFILE}
 
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
 server:
   session:
     # Tomcat session persistence setting

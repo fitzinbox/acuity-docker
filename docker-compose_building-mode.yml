@@ -66,6 +66,7 @@ services:
       - OTHER_PROFILES=NoScheduledJobs
       - WAR_NAME=vahub.war
       - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888/acuity-spring-configs
+      - SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING=true
     env_file:
       - env-configs/vahub.env
   adminui:
