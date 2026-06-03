@@ -65,6 +65,7 @@ services:
       - CONFIG_PROFILE=${CONFIG_PROFILE}
       - OTHER_PROFILES=NoScheduledJobs
       - WAR_NAME=vahub.war
+      - SPRING_APPLICATION_NAME=vahub
       - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888/acuity-spring-configs
       - SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING=true
       - SPRING_MAIN_ALLOW_CIRCULAR_REFERENCES=true
@@ -89,6 +90,7 @@ services:
       - CONFIG_PROFILE=${CONFIG_PROFILE}
       - OTHER_PROFILES=${STORAGE_PROFILE}
       - WAR_NAME=adminui.war
+      - SPRING_APPLICATION_NAME=adminui
       - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888/acuity-spring-configs
     env_file:
       - env-configs/adminui.env
