@@ -90,8 +90,9 @@ services:
       - CONFIG_PROFILE=${CONFIG_PROFILE}
       - OTHER_PROFILES=${STORAGE_PROFILE}
       - WAR_NAME=adminui.war
-      - SPRING_APPLICATION_NAME=adminui
+      - SPRING_APPLICATION_NAME=admin
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888/acuity-spring-configs
+      - SPRING_BATCH_JOB_ENABLED=false
     env_file:
       - env-configs/adminui.env
   postgres:
