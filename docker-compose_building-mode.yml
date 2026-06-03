@@ -69,7 +69,6 @@ services:
       - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888/acuity-spring-configs
       - SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING=true
       - SPRING_MAIN_ALLOW_CIRCULAR_REFERENCES=true
-      - SPRING_AUTOCONFIGURE_EXCLUDE=org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration
     env_file:
       - env-configs/vahub.env
   adminui:
@@ -98,7 +97,6 @@ services:
       - SPRING_BATCH_JOB_ENABLED=false
       - SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING=true
       - SPRING_MAIN_ALLOW_CIRCULAR_REFERENCES=true
-      - SPRING_AUTOCONFIGURE_EXCLUDE=org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration
     env_file:
       - env-configs/adminui.env
   postgres:
