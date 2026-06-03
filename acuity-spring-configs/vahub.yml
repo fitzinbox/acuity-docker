@@ -1,8 +1,7 @@
 # used only to define Kryo cache directory path in local FS; may be useful if you make VAHub connect to different DBs
 # and want to keep different sets of cached data, also allows to keep separate cache directory for integration tests
 env:
-  name:
-    ${ENV_TYPE_PROFILE}
+  name: ${ENV_TYPE_PROFILE}
 
 spring:
   main:
