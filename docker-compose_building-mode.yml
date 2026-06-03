@@ -77,6 +77,8 @@ services:
     profiles: [ "main" ]
     networks:
       - rct_net
+    ports:
+      - "8001:8000"
     depends_on:
       flyway:
         condition: service_completed_successfully
