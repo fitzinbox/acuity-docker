@@ -92,8 +92,8 @@ services:
       - WAR_NAME=adminui.war
       - SPRING_APPLICATION_NAME=adminui
       - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888/acuity-spring-configs
-      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888/acuity-spring-configs
-      - SPRING_CLOUD_CONFIG_ENABLED=true
+      - SPRING_CLOUD_CONFIG_ENABLED=false
+      - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
     env_file:
       - env-configs/adminui.env
   postgres:
