@@ -67,6 +67,7 @@ services:
       - WAR_NAME=vahub.war
       - SPRING_APPLICATION_NAME=vahub
       - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888/acuity-spring-configs
+      - SERVER_SERVLET_SESSION_COOKIE_NAME=VAHUBSESSIONID
       - SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING=true
       - SPRING_MAIN_ALLOW_CIRCULAR_REFERENCES=true
     env_file:
