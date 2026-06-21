@@ -10,6 +10,12 @@ Fix: enable the CLL decode mechanism so LabRepository COALESCE resolves short co
 canonical display names before LiverDatasetsDataProvider sees them. No ETL re-run needed —
 the decode is read-time SQL via LEFT JOIN.
 
+IMPORTANT — ETL timing: StudyRuleDao.update() writes back ALL map_study_rule fields including
+msr_use_alt_lab_codes whenever the ETL detects a change in study valid/completed status.
+If an ETL job is mid-run when this script sets the flag to 1, the ETL write-back will reset it
+to 0. Run this script only when no ETL job is active. The next ETL run will read the flag as 1
+from DB and write it back as 1, making the setting self-sustaining.
+
 All 14 BCSTUDY01 lab codes mapped to human-readable names.
 The four liver test names match LiverDatasetsDataProvider exactly (case-insensitive via .toUpperCase()).
 """
