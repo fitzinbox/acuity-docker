@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """Insert DB mappings for synthetic SDTM files into acuity_db.
-File rules 139-145, mapping rules 2939+, column rules 3131+
+File rules 139-146, mapping rules 2939+, column rules 3131+
 
 Run from scratch on a fresh DB (after Flyway migrations + insert_mappings.py).
-Assumes file rules 139-145 are NOT yet present.
+Assumes file rules 139-146 are NOT yet present.
 
 Domains covered:
   139 FA → PrimaryTumourLocation      (mfd_id=15)
   140 CE → Death                      (mfd_id=14)
   141 PS → PerformanceStatus          (mfd_id=54)
   142 DE → DiseaseExtent              (mfd_id=46)
-  143 LB → Laboratory                 (mfd_id=6)   ← Labs regression fix
+  143 LB → Laboratory                 (mfd_id=6)   ← dual-entity: Test + Laboratory
   144 DM → SubjectCharacteristic      (mfd_id=32)  ← ethnicity grouping
   145 PR → Radiotherapy               (mfd_id=23)  ← prior radiotherapy (CAPRX R)
+  146 VS → Vital source               (mfd_id=33)  ← dual-entity: Test + VitalThin
 
 Tuple format: (mfi_id, csv_col_or_None) or (mfi_id, csv_col_or_None, mmr_value)
   mfi_id    — map_field primary key
@@ -129,6 +130,27 @@ SYNTHETIC = [
         (228, "PRDOSE"),           # radiationDose
         (229, "PRNFRAC"),          # numberOfDoses
         (290, None, "Previous"),   # radioTimeStatus — constant default, no CSV column
+    ]),
+    # VS → Vital source (mfd_id=33) — dual-entity: Test (process_order=1) + VitalThin (process_order=2)
+    # SDTM thin format: one row per measurement (VSTESTCD = SYSBP/DIABP/PULSE/TEMP/WEIGHT/HEIGHT).
+    # testName (mfi_id 438) → VSTESTCD drives which vit_test_name row is created in result_vitals.
+    # Originally added via AdminUI; re-seeded here so a DB reset doesn't silently wipe it.
+    (146, 33, "local://BCSTUDY01/VS.csv", [
+        # Test entity fields (men_id=15, process_order=1) — MUST be mapped or VitalThin rows aren't created
+        (133, "STUDYID"),    # studyName (mandatory)
+        (132, "STUDYID"),    # part (mandatory)
+        (131, "USUBJID"),    # subject (mandatory)
+        (129, "VISITNUM"),   # visit
+        (130, "VSDTC"),      # date (mandatory)
+        # VitalThin entity fields (men_id=38, process_order=2)
+        (434, "STUDYID"),    # studyName (mandatory)
+        (435, "STUDYID"),    # part (mandatory)
+        (436, "USUBJID"),    # subject (mandatory)
+        (437, "VSDTC"),      # date (mandatory)
+        (438, "VSTESTCD"),   # testName (mandatory — SYSBP/DIABP/PULSE/TEMP/WEIGHT/HEIGHT)
+        (439, "VSSTRESN"),   # testResult
+        (440, "VSSTRESU"),   # resultUnit
+        (824, "VISIT"),      # protocolScheduleTimepoint
     ]),
 ]
 
