@@ -154,6 +154,29 @@ SYNTHETIC = [
     ]),
 ]
 
+# Custom lab code decode table (map_custom_labcode_lookup) — enables Hy's Law.
+# LiverDatasetsDataProvider exact-matches lab_code.toUpperCase() against full names.
+# SDTM LBTESTCD short codes won't match until CLL is enabled (msr_use_alt_lab_codes=1).
+# cll_id uses nextval('acuity.cll_seq') — no setval needed (sequence is mutable by acuity user).
+ALT_LAB_CODES = [
+    # (cll_labcode, cll_test_name, cll_sample_name)
+    ("ALT",      "Alanine Aminotransferase",   "Chemistry"),   # → ALANINE AMINOTRANSFERASE
+    ("AST",      "Aspartate Aminotransferase",  "Chemistry"),  # → ASPARTATE AMINOTRANSFERASE
+    ("BILIRUBI", "Total Bilirubin",             "Chemistry"),  # → TOTAL BILIRUBIN
+    ("ALKALINE", "Alkaline Phosphatase",        "Chemistry"),  # → ALKALINE PHOSPHATASE
+    ("CA15-3",   "CA 15-3",                    "Chemistry"),
+    ("CA27-29",  "CA 27-29",                   "Chemistry"),
+    ("CREATINI", "Creatinine",                 "Chemistry"),
+    ("GLUCOSE",  "Glucose",                    "Chemistry"),
+    ("POTASSIU", "Potassium",                  "Chemistry"),
+    ("SODIUM",   "Sodium",                     "Chemistry"),
+    ("HAEMOGLO", "Haemoglobin",                "Haematology"),
+    ("NEUTROPH", "Neutrophils",                "Haematology"),
+    ("PLATELET", "Platelets",                  "Haematology"),
+    ("WHITEBL",  "White Blood Cell Count",     "Haematology"),
+]
+
+
 def build_sql():
     insert_lines = ["BEGIN;"]
     setval_lines = []  # run separately as dbadmin (acuity user lacks setval permission)
@@ -205,6 +228,17 @@ def build_sql():
                 )
                 mcr_id += 1
             mmr_id += 1
+
+    # Custom lab code decode (enables Hy's Law) — uses nextval so no setval step needed
+    insert_lines.append("\n-- ===== CUSTOM LAB CODE DECODE (Hy's Law / LiverDatasetsDataProvider) =====")
+    for labcode, test_name, sample_name in ALT_LAB_CODES:
+        insert_lines.append(
+            f"INSERT INTO map_custom_labcode_lookup (cll_id, cll_labcode, cll_test_name, cll_sample_name, cll_msr_id)"
+            f" VALUES (nextval('acuity.cll_seq'), '{labcode}', '{test_name}', '{sample_name}', {MSR_ID});"
+        )
+    insert_lines.append(
+        f"UPDATE map_study_rule SET msr_use_alt_lab_codes = 1 WHERE msr_id = {MSR_ID};"
+    )
 
     insert_lines.append("\nCOMMIT;")
 
