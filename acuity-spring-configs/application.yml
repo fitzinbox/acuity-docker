@@ -26,16 +26,17 @@ spring:
 
 acuity:
   # used by AdminUI to connect to VAHub
+  # Override APP_USERNAME / APP_PASSWORD env vars before any non-local deployment
   vahub:
     url: http://vahub:8000
-    username: username
-    password: pass
+    username: ${APP_USERNAME:username}
+    password: ${APP_PASSWORD:pass}
   # for authorization module used in all ACUITY apps (basic authentication settings)
   security:
     basic-auth:
       users:
-        - username: username
-          password: pass
+        - username: ${APP_USERNAME:username}
+          password: ${APP_PASSWORD:pass}
           roles:
             - REMOTE_USER
             - ACL_ADMINISTRATOR

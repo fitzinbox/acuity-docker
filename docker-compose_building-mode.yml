@@ -41,7 +41,7 @@ services:
     environment:
       - FLYWAY_URL=jdbc:postgresql://postgres:5432/acuity_db
       - FLYWAY_USER=dbadmin
-      - FLYWAY_PASSWORD=1
+      - FLYWAY_PASSWORD=1  # DEV-ONLY — change before any non-local deployment
       - FLYWAY_PLACEHOLDERS_USER_ACUITY_PASSWORD=your_password
     volumes:
       - ./images/flyway:/flyway/conf

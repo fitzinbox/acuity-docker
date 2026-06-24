@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Generate 4 synthetic SDTM files for BCSTUDY01."""
-import csv, random
+import csv, os, random
 from pathlib import Path
 
 random.seed(42)
-OUTPUT_DIR = Path("/Users/paulfitzpatrick/Projects/ANewAcuity/acuity-docker/local-file-storage/BCSTUDY01")
+OUTPUT_DIR = Path(os.path.dirname(os.path.abspath(__file__))) / "local-file-storage/BCSTUDY01"
 SUBJECTS = [f"BCSTUDY01-PT{i:03d}" for i in range(1, 101)]
 
 # ── FA.csv ──────────────────────────────────────────────────────────────────
