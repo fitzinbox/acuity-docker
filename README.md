@@ -1,84 +1,116 @@
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-## Overview
+# ANewAcuity
 
-This is a primary ACUITY component to start application. This repository also contains [project's Wiki](https://github.com/digital-ECMT/acuity-docker/wiki/Applications-Setup)
+ANewAcuity is a modernised fork of [ACUITY](https://github.com/digital-cancer-research), an open-source clinical trial data visualisation platform. It presents patient-level data — adverse events, laboratory results, tumour response (RECIST), pharmacokinetics, dosing timelines, vital signs, ECGs, and more — as interactive charts and tables for clinical researchers and data scientists.
 
-This project contains docker-compose configuration files and other configs that allow to run an ACUITY instance based on:
-* Prepared docker images downloaded from this repository (`docker-compose.yml` files)
-* If you prefer to build Docker images on the fly (for development or other purposes) - `docker-compose_building-mode.yml`
+This repository (`acuity-docker`) is the entry point for running the full stack via Docker Compose.
 
-Here is a reminder how all ACUITY repositories work together.
-![Repositories scheme](https://github.com/digital-ECMT/acuity-docker/wiki/uploads/images/system/repositories-struct.png)
-<hr>
+## What's different from upstream ACUITY
 
-## ACUITY run
+- **Security removed** — the VASecurity authentication service is not required. All data is open-access. Add your own authentication layer (e.g. an nginx auth proxy) if needed for your deployment.
+- **Fully modernised stack** — Java 21, Spring Boot 3.3.5, Angular 19, PostgreSQL 16. Upstream ran Java 8, Spring Boot 1.5, Angular 5, PostgreSQL 11.
+- **PostgreSQL only** — all Oracle-specific SQL replaced with standard PostgreSQL.
+- **Community ag-Grid** — Enterprise licence dependency removed.
 
-You could run ACUITY as a cloud application (refer to [this repository](https://github.com/digital-ECMT/acuity-deployment-scripts) for this case)
-and as a local instance on your laptop or working station.
+## Prerequisites
 
-### To start application locally on your Windows machine you can download this repository as a zip-archive and navigate to `startup` folder.
-Please refer to steps described in readme for details.
+| Tool | Version |
+|------|---------|
+| Docker | 24+ (with Docker Compose v2) |
+| Java | 21 (for building from source) |
+| Maven | 3.8+ (for building from source) |
+| Node.js | 18.x via nvm (for frontend builds) |
 
-In essence you should launch the following scripts in order:
-1. `acuity-init-db-windows.bat`
-2. `install-SSL-certs-for-local-windows-start.bat`
+If you only want to **run** the stack (not build from source), Docker is all you need — the build artefacts are copied into `building-mode/builds/` before the containers start.
 
-This step can be skipped if you manually created and installed SSL certs:
-* `ca.crt` to `acuity-docker/ssl-certificates/certs/`
-* `ca.key` to `acuity-docker/ssl-certificates/keys/`
+## Quick start
 
-3.`acuity-start-windows.bat`
+```bash
+# Clone all repos (see Repository structure below)
+git clone https://github.com/your-org/acuity-docker
+# ... clone remaining repos into the same parent directory
 
-<b>You should already have `docker` and `docker-compose` installed.</b> 
-For manual and details please visit [this page](https://github.com/digital-ECMT/acuity-docker/wiki/Applications-Setup)
+# First run — wipe and initialise the database
+cd acuity-docker
+docker compose -f docker-compose_building-mode.yml --env-file .env.dev --profile main down -v
+docker compose -f docker-compose_building-mode.yml --env-file .env.dev --profile main up -d
 
-<hr>
-
-## Developers' section:
-
-Installation flow is automated via [deployment-scripts](https://github.com/digital-ECMT/acuity-deployment-scripts). Please refer to this repository to install application either in Cloud or locally.
-
-Here is a description of app set up process which is automated and scripts. Also this section contains some instructions to apply database dumps and other possibilities
-
-- copy `acuity-docker` project content to your user directory subdirectory `acuity-docker`; you need to copy following directories and files:
-    - `env-configs`
-    - `images`
-    - `acuity-spring-configs`
-    - `.env` (if you plan to use this ACUITY instance for production purposes) or `.env.dev` (for development, demo and similar purposes) - it's your .env file
-    - `docker-compose.yml` (if you plan to use ACUITY applications Docker images from a remote registry) or `docker-compose_building-mode.yml` (if you plan to use **building mode**, e.g. build you images yourself  before use them) - it's your Docker Compose file
-- get to `~/acuity-docker` directory using our command line tool (from here, all paths will be relative to this directory, unless mentioned different)
-- if you have a set of predefined config files for your environment (that may be Spring configs, or `.env` config(s), or `<app>.env` configs, or SSL certificates etc), place them to `~/acuity-docker` directory or corresponding subdirectories; most likely, you'll be able just to copy all the content of your prepared config directory to the `~/acuity-docker` dir.
-- if you a going to use default-state configs, make sure they are suitable for your purposes, and update them if needed; in particular, pay attention to the content of the `.env`/`.env.dev` file (there are some comments inside describing what can be changed and why).
-- if you have a data dump in `.sql` or `tar` format to upload to the new database, place it to `/images/postgres/data` directory; otherwise, update `/images/postgres/data/add_global_admin.sql` file setting everywhere global admin email instead of `user@example.com`.
-- if you decided to use building mode, you need built artifacts of ACUITY applications; place them into `/building-mode/builds` directory under names: `adminui.war`, `acuity-config-server.war`, `acuity-flyway.jar`, `vasecurity.war`, `vahub.war`.
-- run `docker-compose -f <your_docker-compose_file>.yml --env-file <your_.env_file> --profile init_db up -d` and wait `acuity-flyway` container to finish its work and exit (it will take a couple of minutes; to make sure it exited, run `docker container ls --all`; in the list of containers you should see something like `artifactory.com:6285/acuity-flyway:9.0-beryllium-SNAPSHOT` in state `Exited`)
-- run `docker exec -i -t acuity-docker_postgres_1 /bin/bash`
-- if you want to apply a DB dump in `.sql` format generated by `acuity-data-oracle-to-pg-transformer` utility, run the following commands:
-```shell script
-psql -d acuity_db -U dbadmin
-\i /usr/root/data/<your_dump_file>.sql
-\q
+# Subsequent runs
+docker compose -f docker-compose_building-mode.yml --env-file .env.dev --profile main up -d
 ```
-- if you want to apply a DB dump in `.tar` format, run the following commands:
-```shell script
-psql -d acuity_db -U dbadmin
-\i /usr/root/data/clear_data_tables.sql
-\q
-pg_restore --host=localhost --port=5432 --username=dbadmin --dbname=acuity_db --schema=acuity --data-only --disable-triggers --format=t /usr/root/data/<your_dump_file>.tar
-psql -d acuity_db -U dbadmin
-\i /usr/root/data/update_sequences.sql
-\q
-```
-- if you want to just add the global administrator user (without it, you won't be able to operate clear ACUITY instance), run the following commands:
-```shell script
-psql -d acuity_db -U dbadmin
-\i /usr/root/data/add_global_admin.sql
-\q
-```
-- run `exit`
-- run `docker-compose -f <your_docker-compose_file>.yml down`
-- run `docker-compose -f <your_docker-compose_file>.yml --env-file <your_.env_file> --profile main up -d`
-Wait for ACUITY applications to start (you may check it using logs in `/logs` directory). After that, they should be accessible through ports 80/443 (VAHub), 444 (VASecurity), 447 (AdminUI) on your environment (if you do it on your local machine, addresses will look like `https://localhost:447`).
 
-## More info
-To find more info about ACUITY deployment and running please check main [ACUITY wiki](https://github.com/digital-ECMT/acuity-docker/wiki).
+Once running:
+- **VAHub** (visualisation UI): http://localhost:8080
+- **AdminUI** (data loading): http://localhost:8081
+- **Health check**: http://localhost:8080/actuator/health → `{"status":"UP"}`
+
+Startup takes 3–5 minutes. AdminUI logs to `/var/log/adminui/adminui.log` inside the container (not stdout).
+
+## Repository structure
+
+All repositories should be cloned into the same parent directory.
+
+| Repo | Role |
+|------|------|
+| `acuity-docker` | Docker Compose orchestration — **start here** |
+| `acuity-vahub` | Main app — Spring Boot backend + Angular 19 frontend |
+| `acuity-admin` | Data loading — Spring Boot + Spring Batch ETL |
+| `acuity-config-server` | Spring Cloud Config Server |
+| `acuity-flyway` | Flyway database migrations |
+| `acuity-va-security` | Auth library (build and install locally; not a running service) |
+| `acuity-deployment-scripts` | Azure provisioning scripts (optional) |
+| `ACUITY_docs` | Documentation |
+
+All repos are on the `remove-security` branch.
+
+## Building from source
+
+See [TECHNICAL_GUIDE.md](../acuity-vahub/TECHNICAL_GUIDE.md) for full build instructions. The short version:
+
+```bash
+# 1. Build va-security library first
+cd acuity-va-security
+mvn clean install -Dmaven.test.skip=true -Dfindbugs.skip=true
+
+# 2. Build vahub (backend + Angular frontend)
+cd acuity-vahub
+mvn clean package -Pwebapp -Dmaven.test.skip=true -Dfindbugs.skip=true -Dcheckstyle.skip=true
+
+# 3. Build adminui
+cd acuity-admin
+mvn clean package -Dmaven.test.skip=true -Dfindbugs.skip=true -Dcheckstyle.skip=true
+
+# 4. Copy build artefacts
+cp acuity-vahub/vahub/target/vahub-9.0-beryllium-SNAPSHOT.war  acuity-docker/building-mode/builds/vahub.war
+cp acuity-admin/acuity-core/target/adminui-9.0-beryllium-SNAPSHOT.war acuity-docker/building-mode/builds/adminui.war
+```
+
+## Loading data
+
+Data is loaded via AdminUI using SDTM-format CSV files. The process is:
+
+1. Create a **Drug Programme** and **Dataset** in AdminUI
+2. Map each SDTM domain file to the corresponding entity (AE, LB, VS, EG, EX, PC, TR, CM, MH, DM, DS, etc.)
+3. Run the ETL job
+
+See [USER_GUIDE.md](USER_GUIDE.md) for a full walkthrough.
+
+## Configuration
+
+Spring configuration files live in `acuity-spring-configs/`. Database credentials and service passwords are set via environment files in `env-configs/`.
+
+> **Important:** The default database password (`POSTGRES_PASSWORD=1`) and Spring inter-service credentials (`username`/`pass`) are development defaults only. Override these for any non-local or shared deployment.
+
+## Known limitations
+
+- **No authentication** — all data is accessible to anyone who can reach the application. Secure your network perimeter accordingly.
+- **14 pre-existing test failures** in `vahub-model` (AeChordContributor, AeService, TumourColumnRange) — domain logic assertion mismatches, not build-blocking.
+- **ag-Grid Community only** — Enterprise features (column grouping menus, row grouping) are not available.
+- **va-security Maven dependency** — vahub and adminui still reference va-security as a compile-time library. Full removal is planned for a future release.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Licence
+
+Apache 2.0 — see [LICENSE](LICENSE). Forked from [digital-cancer-research/ACUITY](https://github.com/digital-cancer-research) which is also Apache 2.0.
