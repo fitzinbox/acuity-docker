@@ -1,4 +1,4 @@
-FROM postgres:16
+FROM --platform=linux/amd64 postgres:16
 
 WORKDIR /usr/root
 

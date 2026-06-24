@@ -2,6 +2,7 @@ version: "3.9"  # optional since v1.27.0
 services:
   httpd:
     image: ${REPOSITORY_AND_SLASH}httpd:${ACUITY_VERSION}
+    platform: linux/amd64
     restart: always
     profiles: [ "main" ]
     networks:
@@ -19,6 +20,7 @@ services:
       - ./images/httpd/ssl.conf:/usr/local/apache2/conf.d/ssl.conf
   config-server:
     image: ${REPOSITORY_AND_SLASH}acuity-config-server:${ACUITY_VERSION}
+    platform: linux/amd64
     restart: always
     profiles: [ "main" ]
     networks:
@@ -27,6 +29,7 @@ services:
       - ./acuity-spring-configs:/usr/root/acuity-spring-configs
   vasecurity:
     image: ${REPOSITORY_AND_SLASH}va-security:${ACUITY_VERSION}
+    platform: linux/amd64
     restart: always
     profiles: [ "main" ]
     networks:
@@ -42,6 +45,7 @@ services:
       - env-configs/vasecurity.env
   vahub:
     image: ${REPOSITORY_AND_SLASH}vahub:${ACUITY_VERSION}
+    platform: linux/amd64
     restart: always
     profiles: [ "main" ]
     networks:
@@ -58,6 +62,7 @@ services:
       - env-configs/vahub.env
   adminui:
     image: ${REPOSITORY_AND_SLASH}adminui:${ACUITY_VERSION}
+    platform: linux/amd64
     restart: always
     profiles: [ "main" ]
     networks:
@@ -74,6 +79,7 @@ services:
       - env-configs/adminui.env
   postgres:
     image: ${REPOSITORY_AND_SLASH}acuity-postgresql:${ACUITY_VERSION}
+    platform: linux/amd64
     restart: always
     profiles:
       - main
@@ -90,6 +96,7 @@ services:
         target: /usr/root/data
   flyway:
     image: ${REPOSITORY_AND_SLASH}acuity-flyway:${ACUITY_VERSION}
+    platform: linux/amd64
     profiles: [ "init_db" ]
     networks:
       - rct_net

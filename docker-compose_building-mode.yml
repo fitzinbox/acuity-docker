@@ -2,6 +2,7 @@ version: "3.9"  # optional since v1.27.0
 services:
   httpd:
     build: building-mode/images/httpd
+    platform: linux/amd64
     restart: always
     profiles: [ "main" ]
     networks:
@@ -19,6 +20,7 @@ services:
       - ./images/httpd/ssl.conf:/usr/local/apache2/conf.d/ssl.conf
   config-server:
     build: building-mode/images/config-server
+    platform: linux/amd64
     restart: always
     profiles: [ "main" ]
     networks:
@@ -30,6 +32,7 @@ services:
       - WAR_NAME=acuity-config-server.war
   flyway:
     image: flyway/flyway:7.5.0-alpine
+    platform: linux/amd64
     restart: on-failure
     profiles: [ "main" ]
     networks:
@@ -48,6 +51,7 @@ services:
       - ./building-mode/builds/acuity-flyway.jar:/flyway/jars/acuity-flyway.jar
   vahub:
     build: building-mode/images/acuity-app
+    platform: linux/amd64
     restart: always
     profiles: [ "main" ]
     networks:
@@ -74,6 +78,7 @@ services:
       - env-configs/vahub.env
   adminui:
     build: building-mode/images/acuity-app
+    platform: linux/amd64
     restart: always
     profiles: [ "main" ]
     networks:
@@ -103,6 +108,7 @@ services:
       - env-configs/adminui.env
   postgres:
     build: building-mode/images/postgres
+    platform: linux/amd64
     restart: always
     profiles:
       - main
