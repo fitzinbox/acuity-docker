@@ -26,7 +26,7 @@ If you only want to **run** the stack (not build from source), Docker is all you
 
 ```bash
 # Clone all repos (see Repository structure below)
-git clone https://github.com/your-org/acuity-docker
+git clone https://github.com/fitzinbox/acuity-docker
 # ... clone remaining repos into the same parent directory
 
 # First run — wipe and initialise the database
@@ -60,11 +60,11 @@ All repositories should be cloned into the same parent directory.
 | `acuity-deployment-scripts` | Azure provisioning scripts (optional) |
 | `ACUITY_docs` | Documentation |
 
-All repos are on the `remove-security` branch.
+All repos are on the `main` branch.
 
 ## Building from source
 
-See [TECHNICAL_GUIDE.md](../acuity-vahub/TECHNICAL_GUIDE.md) for full build instructions. The short version:
+See [TECHNICAL_GUIDE.md](https://github.com/fitzinbox/acuity-vahub/blob/main/TECHNICAL_GUIDE.md) for full build instructions. The short version:
 
 ```bash
 # 1. Build va-security library first
@@ -92,7 +92,7 @@ Data is loaded via AdminUI using SDTM-format CSV files. The process is:
 2. Map each SDTM domain file to the corresponding entity (AE, LB, VS, EG, EX, PC, TR, CM, MH, DM, DS, etc.)
 3. Run the ETL job
 
-See [USER_GUIDE.md](USER_GUIDE.md) for a full walkthrough.
+A data loading walkthrough will be added in a future release.
 
 ## Configuration
 
@@ -109,7 +109,7 @@ Spring configuration files live in `acuity-spring-configs/`. Database credential
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+Open an issue or pull request on GitHub.
 
 ## Licence
 
