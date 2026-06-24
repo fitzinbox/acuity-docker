@@ -8,3 +8,11 @@
 startup/install-SSL-for-local-start/generated-ssl-certificates
 /local-file-storage/
 /vahub-cache/
+.vscode/
+.classpath
+.project
+node_modules/
+target/
+*.log
+*.env.local
+application-local.yml
