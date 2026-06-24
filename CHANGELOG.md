@@ -62,3 +62,36 @@ ANewAcuity takes the upstream ACUITY platform and brings it forward to a fully m
 - JUnit 4 → 5 migration across 302 test files (280 vahub, 22 admin)
 - Mockito 5 API updates, EhCache → Caffeine in test config, `javax.*` → `jakarta.*` in test code
 - `mvn test-compile` clean across all repos
+
+---
+
+### Frontend dependency security audit
+
+`npm audit` was run against the Angular frontend prior to release. 67 vulnerabilities were found in the dependency tree; 17 were resolved by safe transitive patches (`npm audit fix`, no `--force`); 50 remain deferred.
+
+**Fixed (17) — commit `28fdd7f`:**
+
+| Package | Severity | Issue |
+|---------|----------|-------|
+| loader-utils | Critical | Prototype pollution (GHSA-76p3-8jx3-jpfq), ReDoS (GHSA-3rfm-jhwj-7488, GHSA-hhq3-ff78-jv3g) |
+| ws | High | Memory exhaustion DoS (GHSA-96hv-2xvq-fx4p) |
+| engine.io, socket.io-adapter | High | Transitive via ws |
+| http-proxy-middleware | High | CRLF injection (GHSA-gcq2-9pq2-cxqm) |
+| ajv | Moderate | ReDoS via $data (GHSA-2g4f-4pwh-qvx6) |
+
+**Deferred (50) — rationale:**
+
+| Package(s) | Severity | Rationale |
+|------------|----------|-----------|
+| @angular/core, @angular/common, @angular/compiler | High/Moderate | CVEs are SSR-specific (DOM clobbering, XSS via server rendering). ANewAcuity does not use Angular SSR — these vulnerabilities have no attack surface in this application. Fix requires Angular 22+. |
+| ag-grid-community | High | Prototype pollution. Fix requires ag-Grid 36 (we are on 29 — three major versions). Deferred for ag-Grid upgrade cycle. |
+| babel-traverse | Critical | RCE on malicious code input — build tool only, not present at runtime. Fix would downgrade @angular/compiler-cli to v15, which would break the build. |
+| lodash (in karma) | Critical | Prototype pollution and command injection — in karma-junit-reporter's subdependency only. karma is a dev-only test runner. Fix would break the karma test reporter. |
+| moment | High | Path traversal, ReDoS. Pinned at `2.22.2` by upstream; upgrade to 2.30.1 deferred to assess date formatting impact. |
+| d3-color / d3 | High | ReDoS. Fix requires d3 v7 major upgrade. Deferred. |
+| hoek | High | Prototype pollution. No fix available — ancient transitive dependency via joi. Full dependency chain replacement needed. |
+| immutable | High | Prototype pollution (GHSA-wf6x-7x77-mvgw). Pinned at `3.8.1`; upgrade to 3.8.3 is outside the version range. Low risk — immutable is used for in-memory data structures, not network input parsing. |
+| bootstrap | Moderate | XSS in Popover/Tooltip components. Bootstrap 3→5 is a full CSS breaking change; deferred. |
+| Build tool dependencies (tar, esbuild, vite, piscina, serialize-javascript, postcss, uuid, js-yaml, jquery) | High/Moderate | All in build tools or dev server. Fixes pull @angular-devkit/build-angular@0.802.2 (Angular CLI 8 — would break the build catastrophically). No runtime risk. |
+
+`ng build` passes cleanly with the 17 applied patches.
