@@ -92,7 +92,7 @@ Data is loaded via AdminUI using SDTM-format CSV files. The process is:
 2. Map each SDTM domain file to the corresponding entity (AE, LB, VS, EG, EX, PC, TR, CM, MH, DM, DS, etc.)
 3. Run the ETL job
 
-A data loading walkthrough will be added in a future release.
+See [USER_GUIDE.md](https://github.com/fitzinbox/acuity-vahub/blob/main/USER_GUIDE.md) for a full walkthrough.
 
 ## Configuration
 
